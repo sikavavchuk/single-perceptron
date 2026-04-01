@@ -9,26 +9,25 @@ import Foundation
 
 struct ProgramManager {
     
-    func loadData(from fileName: String) -> [Sample] {
-            var samples: [Sample] = []
-
+    var samples: [([Double], Int)] = []
+    
+    mutating func loadData(from fileName: String) -> [([Double], Int)] {
+            
             //get the file path in Documents folder
             if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let fileURL = dir.appendingPathComponent(fileName)
 
                 //debug lines
-                guard FileManager.default.fileExists(atPath: fileURL.path) else {
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    print("File exists: \(fileURL.path)")
+                } else {
                     print("File does NOT exist: \(fileURL.path)")
-                    return samples
                 }
-
-                print("File exists: \(fileURL.path)")
 
                 do {
                     let text = try String(contentsOf: fileURL, encoding: .utf8)
                     
                     //normalize line endings, replace all \r\n and \r with \n so every line is separated consistently
-                    
                     let normalizedText = text
                         .replacingOccurrences(of: "\r\n", with: "\n")
                         .replacingOccurrences(of: "\r", with: "\n")
@@ -52,17 +51,16 @@ struct ProgramManager {
                         }
 
                         var label: Int = 0 //default
-                        
+                                                
                         if let lastPart = parts.last {
-                            if lastPart == "iris-setosa" {
+                            if lastPart == "Iris-setosa" {
                                 label = 1
                             } else {
                                 label = 0
                             }
                         }
                         
-                        let sample = Sample(features: features, label: label)
-                        
+                        let sample: ([Double], Int) = (features, label)
                         samples.append(sample)
                     }
 
